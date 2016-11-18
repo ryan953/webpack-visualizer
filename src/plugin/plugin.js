@@ -11,7 +11,7 @@ export default class VisualizerPlugin {
         this.opts = {};
         this.opts.filename = opts.filename || 'stats.html';
     }
-    
+
     apply(compiler) {
         compiler.plugin('emit', (compilation, callback) => {
             var stats = compilation.getStats().toJson();
@@ -22,7 +22,7 @@ export default class VisualizerPlugin {
                 <script>window.nodesData = ${JSON.stringify(buildHierarchy(stats))};</script>
                 <script>${jsString}</script>
             `;
-            
+
             compilation.assets[this.opts.filename] = {
                 source: function () {
                     return html;
@@ -31,7 +31,7 @@ export default class VisualizerPlugin {
                     return html.length;
                 }
             };
-            
+
             callback();
         });
     }

@@ -1,15 +1,17 @@
 import React from 'react';
+import cx from 'classnames';
 import Chart from '../shared/components/chart';
 import ChartDetails from '../shared/components/chart-details';
 import Breadcrumbs from '../shared/components/breadcrumbs';
 import Footer from '../shared/components/footer';
+import ChunkSelector from '../shared/components/chunk-selector';
 import addDragDrop from '../shared/util/dragdrop';
 import readFile from '../shared/util/readFile';
 import buildHierarchy from '../shared/buildHierarchy';
-
+import { getChunkNames } from '../shared/util/getChunkNames';
 
 export default React.createClass({
-    
+
     getInitialState() {
         return {
             needsUpload: true,
@@ -17,10 +19,11 @@ export default React.createClass({
             chartData: null,
             hoverDetails: null,
             breadcrumbNodes: [],
-            paddingDiff: 0
+            paddingDiff: 0,
+            chunkName: '*',
         };
     },
-    
+
     componentDidMount() {
         addDragDrop({
             el: this.refs.ChartArea,
@@ -39,94 +42,59 @@ export default React.createClass({
             }
         });
     },
-    
+
     chartAreaClick() {
         if (this.state.needsUpload) {
             this.refs.FileInput.click();
         }
     },
-    
+
     onFileChange(ev) {
         readFile(ev.target.files[0], this.handleFileUpload);
     },
-    
+
     handleFileUpload(jsonText) {
-        var json = JSON.parse(jsonText);
-        
+        this.stats = JSON.parse(jsonText);
+
         this.setState({
             needsUpload: false,
-            chartData: buildHierarchy(json)
+            chartData: buildHierarchy(this.stats, this.state.chunkName)
         });
     },
-    
-    loadDemo() {
-        this.setState({
-            demoLoading: true
-        });
-        
-        var request = new XMLHttpRequest();
-        request.open('GET', 'stats-demo.json', true);
-        
-        request.onload = () => {
-            this.setState({
-                demoLoading: false
-            });
-            
-            if (request.status >= 200 && request.status < 400) {
-                this.handleFileUpload(request.response);
-            }
-        };
-        
-        request.send();
-    },
-    
+
     onChartRender(details) {
         this.setState({
             paddingDiff: details.removedTopPadding
         });
     },
-    
+
     onChartHover(details) {
         this.setState({
             hoverDetails: details,
             breadcrumbNodes: details.ancestorArray
         });
     },
-    
+
     onChartUnhover() {
         this.setState({
             hoverDetails: null,
             breadcrumbNodes: []
         });
     },
-    
+
     render() {
-        var demoButton;
         var chartAreaClass = 'chart';
-        
-        if (this.state.dragging) {
-            chartAreaClass += ' chart--dragging';
-        }
-        
-        if (this.state.needsUpload) {
-            chartAreaClass += ' chart--needsUpload';
-            
-            let demoClass = 'destyledButton';
-            if (this.state.demoLoading) {
-                demoClass += ' demoLoading';
-            }
-            
-            demoButton = <button onClick={this.loadDemo} className={demoClass} style={{marginTop: '0.5em'}}>Try a Demo</button>;
-        }
-        
-        if (this.state.chartData && this.state.chartData.maxDepth > 9) {
-            chartAreaClass += ' chart--large';
-        }
-                
+        var chartAreaClass = cx(
+          'chart',
+          { 'chart--dragging': this.state.dragging },
+          { 'chart--needsUpload': this.state.needsUpload },
+          { 'chart--large': this.state.chartData && this.state.chartData.maxDepth > 9 },
+        );
+
         return (
             <div>
                 <h1>Webpack Visualizer</h1>
-                
+
                 <div ref="ChartArea" className={chartAreaClass} onClick={this.chartAreaClick}>
                     <div className="chart-uploadMessage">
                         <p>Drop JSON file here or click to choose.</p>
@@ -140,21 +108,35 @@ export default React.createClass({
                         onRender={this.onChartRender}
                     />
                 </div>
-                
+
                 <input
                     ref="FileInput"
                     type="file"
                     className="hiddenFileInput"
                     onChange={this.onFileChange}
                 />
-                {demoButton}
-                
+
+                {this.stats ? (
+                  <ChunkSelector
+                    options={['*', ...getChunkNames(this.stats)]}
+                    onChange={(chunkName) => {
+                      console.log(chunkName);
+                      // this.setState({ chunkName });
+                      this.setState({
+                          chunkName,
+                          chartData: buildHierarchy(this.stats, chunkName)
+                      });
+                    }}
+                    value={this.state.chunkName}
+                  />
+                ) : null}
+
                 <Breadcrumbs nodes={this.state.breadcrumbNodes} />
-                
+
                 <Footer>
                     <h2>How do I get stats JSON from webpack?</h2>
                     <p><code>webpack --json > stats.json</code></p>
-                    
+
                     <h2>Try the Plugin!</h2>
                     <p>This tool is also available as a webpack plugin:</p>
                     <p><code>npm install webpack-visualizer-plugin</code></p>
