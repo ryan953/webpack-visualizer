@@ -1,36 +1,33 @@
-# Webpack Visualizer
-Visualize and analyze your Webpack bundle to see which modules are taking up space and which might be duplicates.
-
-This tool is still pretty new, so please submit issues or feature requests!
-
-
-## Site Usage
-
-Upload your stats JSON file to the site: [chrisbateman.github.io/webpack-visualizer/](http://chrisbateman.github.io/webpack-visualizer/)
-
-## Plugin Usage
+## Usage
 
 ```
-npm install webpack-visualizer-plugin
+git clone https://github.com/bradencanderson/webpack-visualizer.git
 ```
-```javascript
-var Visualizer = require('webpack-visualizer-plugin');
-
-//...
-plugins: [new Visualizer()],
-//...
+```sh
+cd webpack-visualizer
+npm install
+npm run build
+npm run dev
 ```
-This will output a file named `stats.html` in your output directory. You can modify the name/location by passing a `filename` parameter into the constructor.
+Generate a webpack stats file:
 
 ```javascript
-var Visualizer = require('webpack-visualizer-plugin');
-
-//...
-plugins: [new Visualizer({
-  filename: './statistics.html'
-})],
-//...
+plugins.push(new BundleAnalyzerPlugin({
+    analyzerMode: 'disabled',
+    openAnalyzer: false,
+    generateStatsFile: true,
+    statsFilename: 'stats/stats.json',
+    statsOptions: {
+      assets: true,
+      source: false,
+      chunks: true,
+      modules: true,
+      children: true,
+    }
+  }));
 ```
+
+Then open up `localhost:8080` and drag your stats file into the window.
 
 ---
 
