@@ -2,6 +2,7 @@ import React from 'react';
 import cx from 'classnames';
 import Chart from '../shared/components/chart';
 import ChartDetails from '../shared/components/chart-details';
+import ReasonList from '../shared/components/reason-list';
 import Breadcrumbs from '../shared/components/breadcrumbs';
 import Footer from '../shared/components/footer';
 import ChunkSelector from '../shared/components/chunk-selector';
@@ -19,6 +20,7 @@ export default React.createClass({
             chartData: null,
             hoverDetails: null,
             breadcrumbNodes: [],
+            reasons: null,
             paddingDiff: 0,
             chunkName: '*',
         };
@@ -71,14 +73,16 @@ export default React.createClass({
     onChartHover(details) {
         this.setState({
             hoverDetails: details,
-            breadcrumbNodes: details.ancestorArray
+            breadcrumbNodes: details.ancestorArray,
+            reasons: details.reasonArray,
         });
     },
 
     onChartUnhover() {
         this.setState({
             hoverDetails: null,
-            breadcrumbNodes: []
+            breadcrumbNodes: [],
+            reasons: null,
         });
     },
 
@@ -132,6 +136,7 @@ export default React.createClass({
                 ) : null}
 
                 <Breadcrumbs nodes={this.state.breadcrumbNodes} />
+                <ReasonList reasonArray={this.state.reasons} />
 
                 <Footer>
                     <h2>How do I get stats JSON from webpack?</h2>

@@ -1,9 +1,9 @@
 import React from 'react';
+import Breadcrumbs from '../shared/components/breadcrumbs';
 import Chart from '../shared/components/chart';
 import ChartDetails from '../shared/components/chart-details';
-import Breadcrumbs from '../shared/components/breadcrumbs';
 import Footer from '../shared/components/footer';
-
+import ReasonList from '../shared/components/reason-list';
 
 export default React.createClass({
     
@@ -15,6 +15,7 @@ export default React.createClass({
         return {
             hoverDetails: null,
             breadcrumbNodes: [],
+            reasons: null,
             paddingDiff: 0
         };
     },
@@ -28,14 +29,16 @@ export default React.createClass({
     onChartHover(details) {
         this.setState({
             hoverDetails: details,
-            breadcrumbNodes: details.ancestorArray
+            breadcrumbNodes: details.ancestorArray,
+            reasons: details.reasonArray,
         });
     },
     
     onChartUnhover() {
         this.setState({
             hoverDetails: null,
-            breadcrumbNodes: []
+            breadcrumbNodes: [],
+            reasons: null,
         });
     },
     
@@ -61,6 +64,7 @@ export default React.createClass({
                 </div>
                 
                 <Breadcrumbs nodes={this.state.breadcrumbNodes} />
+                <ReasonList reasonArray={this.state.reasons} />
                 
                 <Footer />
             </div>

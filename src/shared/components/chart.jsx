@@ -26,6 +26,8 @@ export default React.createClass({
     },
 
     createChart(root) {
+        console.log('data', root);
+        window.data = root;
         var details = createVisualization({
             svgElement: this.refs.svg,
             root,

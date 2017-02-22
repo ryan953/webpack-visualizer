@@ -1,6 +1,11 @@
 import d3 from 'd3';
 import {getColor} from './colors';
-import {markDuplicates, getAllChildren, getAncestors} from './partitionedDataUtils';
+import {
+    markDuplicates,
+    getAllChildren,
+    getAncestors,
+    getReasons,
+} from './partitionedDataUtils';
 import prettySize from 'prettysize';
 
 
@@ -59,6 +64,9 @@ export default function createVisualization({svgElement, root, onHover, onUnhove
         .style('opacity', 1)
         .on('mouseover', object => {
             mouseover(object, onHover);
+        })
+        .on('click', object => {
+            click(object);
         });
 
     totalSize = paths.node().__data__.value;
@@ -101,6 +109,7 @@ function mouseover(object, callback) {
 
     var childrenArray = getAllChildren(object);
     var ancestorArray = getAncestors(object);
+    var reasonArray = getReasons(object);
 
     // Fade all the segments.
     paths.style({
@@ -124,10 +133,15 @@ function mouseover(object, callback) {
 
     callback({
         ancestorArray,
+        reasonArray,
         name: object.name,
         size: prettySize(object.value, true, true),
         percentage: percentageString
     });
+}
+
+function click(object) {
+    console.log('clicked', object);
 }
 
 function mouseleave(object, callback) {

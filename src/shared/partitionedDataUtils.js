@@ -11,6 +11,14 @@ export function getAncestors(node) {
     return ancestors;
 }
 
+export function getReasons(rootNode) {
+    // var reasons = [];
+
+    return rootNode.reasons || null;
+    // console.log('rootNode', rootNode);
+
+    // return reasons;
+}
 
 export function getAllChildren(rootNode) {
     var allChildren = [];
